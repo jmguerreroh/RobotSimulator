@@ -30,7 +30,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 include(FetchContent)
 FetchContent_Declare(RobotSimulator
-  GIT_REPOSITORY https://github.com/TU_USUARIO/RobotSimulator.git
+  GIT_REPOSITORY https://github.com/jmguerreroh/RobotSimulator.git
   GIT_TAG main)
 FetchContent_MakeAvailable(RobotSimulator)
 
