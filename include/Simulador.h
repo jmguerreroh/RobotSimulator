@@ -16,6 +16,7 @@
 //                                {'.','.','.','.','X'} };
 //         simulador.setTablero(tablero);   // abre la ventana; NO bloquea
 //         // ... algoritmo del alumno, llamando a setTablero() cuando cambie ...
+//         simulador.pause(500);            // (opcional) espera 500 ms para ver el tablero
 //         simulador.esperarCierre();       // (opcional) espera a que se cierre la ventana
 //         simulador.fin();
 //     }
@@ -73,6 +74,11 @@ public:
     // false cuando la ventana se cerró (por el usuario o por fin()).
     // Antes de la primera llamada a setTablero() devuelve true.
     bool abierto() const;
+
+    // Espera 'ms' milisegundos para que dé tiempo a ver el tablero (la ventana sigue dibujando mientras tanto).
+    // Si la ventana se cierra durante la espera (o ya estaba cerrada) vuelve de inmediato.
+    // Lanza std::invalid_argument si ms < 0.
+    void pause(int ms);
 
     // Bloquea hasta que el usuario cierre la ventana. Si no hay ventana abierta
     // vuelve de inmediato. Útil al final de main() para poder contemplar el resultado.

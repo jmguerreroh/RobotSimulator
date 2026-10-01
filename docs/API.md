@@ -57,9 +57,15 @@ una vez cerrada la anterior.
 ## `bool abierto() const`
 `true` antes de la primera llamada a `setTablero` y mientras la ventana esté abierta; `false` después.
 
+## `void pause(int ms)`
+Espera `ms` milisegundos para que dé tiempo a ver el tablero; la ventana sigue dibujando durante la espera. Si la
+ventana se cierra durante la pausa (o ya estaba cerrada, o se llamó a `fin()`) vuelve **de inmediato**, así un bucle con
+`pause` termina enseguida cuando el usuario cierra la ventana. `ms == 0` no espera; `ms < 0` lanza `std::invalid_argument`.
+Funciona también antes de abrir la ventana. Equivale a un `sleep` interrumpible: no sustituye a `setTablero`.
+
 ## `void esperarCierre()`
 Bloquea el hilo llamante hasta que el usuario cierre la ventana (o `fin()` se llame desde otro hilo). Si no hay
 ventana abierta, vuelve al instante.
 
 ## Hilos
-`setTablero`, `fin`, `abierto` y `esperarCierre` pueden llamarse desde cualquier hilo. No hay callbacks al código del alumno.
+`setTablero`, `fin`, `abierto`, `pause` y `esperarCierre` pueden llamarse desde cualquier hilo. No hay callbacks al código del alumno.

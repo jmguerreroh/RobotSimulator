@@ -1,8 +1,10 @@
 #include "Simulador.h"
 
+#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <mutex>
+#include <stdexcept>
 #include <thread>
 
 #include "Board.h"
@@ -67,6 +69,17 @@ struct Simulador::Impl {
         return false;
     }
 
+    void pause(int ms) {
+        if (ms < 0) throw std::invalid_argument("Simulador::pause: los milisegundos no pueden ser negativos");
+        // Se espera a trozos para poder cortar la pausa en cuanto se cierre la ventana.
+        const auto deadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(ms);
+        while (state.load() != State::Closed && isOpen()) {
+            const auto remaining = deadline - std::chrono::steady_clock::now();
+            if (remaining <= std::chrono::steady_clock::duration::zero()) return;
+            std::this_thread::sleep_for(std::min<std::chrono::steady_clock::duration>(remaining, std::chrono::milliseconds(10)));
+        }
+    }
+
     void waitForClose() {
         if (state.load() != State::Running) return;
         while (loop.running()) std::this_thread::sleep_for(std::chrono::milliseconds(20));
@@ -108,5 +121,7 @@ void Simulador::setTableroConPaso(const char* tablero, int tamX, int tamY, int p
 void Simulador::fin() { impl_->fin(); }
 
 bool Simulador::abierto() const { return impl_->isOpen(); }
+
+void Simulador::pause(int ms) { impl_->pause(ms); }
 
 void Simulador::esperarCierre() { impl_->waitForClose(); }

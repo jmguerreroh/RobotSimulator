@@ -8,8 +8,8 @@ La ventana tiene su propio hilo, así que **tu programa nunca se queda esperando
 
 ### Empezar en 3 pasos
 
-Solo necesitas una carpeta con tu `main.cpp` y un fichero `CMakeLists.txt`. **No hace falta descargar nada a mano**:
-CMake trae el simulador de GitHub él solo.
+Solo necesitas una carpeta con **un fichero**, `CMakeLists.txt`. **No hace falta descargar nada a mano ni escribir
+el `main.cpp`**: CMake trae el simulador de GitHub y te crea una plantilla de `main.cpp` lista para completar.
 
 **Paso 1 — Instala las herramientas (una sola vez).**
 
@@ -19,9 +19,7 @@ CMake trae el simulador de GitHub él solo.
 | Fedora | `sudo dnf install gcc-c++ cmake git glfw-devel mesa-libGL-devel` |
 | Windows | Visual Studio con «Desarrollo para el escritorio con C++» (incluye CMake) y [Git](https://git-scm.com) |
 
-**Paso 2 — Crea estos dos ficheros en tu carpeta.**
-
-`CMakeLists.txt` (cópialo tal cual, solo cambia `MiPrograma` si quieres):
+**Paso 2 — Crea `CMakeLists.txt` en tu carpeta** (cópialo tal cual):
 
 ```cmake
 cmake_minimum_required(VERSION 3.16)
@@ -34,52 +32,37 @@ FetchContent_Declare(RobotSimulator
   GIT_TAG main)
 FetchContent_MakeAvailable(RobotSimulator)
 
-add_executable(MiPrograma main.cpp)
-target_link_libraries(MiPrograma PRIVATE RobotSimulator)
-```
-
-`main.cpp` (tu programa; empieza con este):
-
-```cpp
-#include <Simulador.h>
-
-int main()
-{
-    Simulador simulador;
-
-    char tablero[5][8] = {
-        {'R','.','.','.','.','.','.','.'},
-        {'.','.','*','*','*','.','.','.'},
-        {'.','.','.','.','*','.','.','.'},
-        {'.','.','.','.','.','.','X','.'},
-        {'.','.','.','.','.','.','.','.'},
-    };
-
-    simulador.setTablero(tablero);   // abre la ventana; el programa sigue
-
-    // ... tu algoritmo: cambia el tablero y vuelve a llamar a setTablero(tablero) ...
-
-    simulador.esperarCierre();       // mantiene la ventana hasta que la cierres
-    simulador.fin();
-}
+robot_practica()
 ```
 
 **Paso 3 — Compila y ejecuta** (desde tu carpeta; la primera vez descarga el simulador y tarda un poco):
 
 ```bash
-cmake -S . -B build
+cmake -S . -B build          # crea main.cpp en tu carpeta (solo si no existía)
 cmake --build build
 ./build/MiPrograma
 ```
 
 En Windows, con Visual Studio: `cmake -S . -B build` y `cmake --build build --config Release`, y se ejecuta
-`build\Release\MiPrograma.exe`. Cada vez que modifiques `main.cpp` solo repites los dos últimos comandos.
+`build\Release\MiPrograma.exe`.
+
+Después del primer `cmake` tu carpeta tiene un **`main.cpp` con un tablero de ejemplo**: es tuyo, edítalo y vuelve a
+ejecutar `cmake --build build` (CMake no lo vuelve a tocar). Si necesitas más ficheros `.cpp`:
+`robot_practica(FUENTES otro.cpp algoritmo.cpp)`.
 
 > Si ves un error de GLFW o de X11 al configurar, te falta instalar algo del paso 1.
 
 ### Cómo se usa
 
-Cada vez que **cambie el tablero**, llama otra vez a `simulador.setTablero(tablero)`. Solo eso.
+Cada vez que **cambie el tablero**, llama otra vez a `simulador.setTablero(tablero)`. Como `setTablero` no espera,
+usa `simulador.pause(ms)` para detener tu programa unos milisegundos y que dé tiempo a ver cada paso:
+
+```cpp
+tablero[1][2] = '-';
+tablero[1][3] = 'R';
+simulador.setTablero(tablero);
+simulador.pause(300);      // espera 300 ms (si cierras la ventana, vuelve enseguida)
+```
 
 | Carácter | Significa |
 |---|---|
@@ -127,7 +110,7 @@ Opciones: `-DROBOTSIM_BUILD_EXAMPLES=OFF`, `-DROBOTSIM_BUILD_TESTS=OFF`.
 
 ### Usarlo en tu propio proyecto (sin descarga automática)
 
-Si prefieres clonar el repositorio tú mismo (`git clone https://github.com/TU_USUARIO/RobotSimulator.git`)
+Si prefieres clonar el repositorio tú mismo (`git clone https://github.com/jmguerreroh/RobotSimulator.git`)
 en lugar de usar `FetchContent` (ver «Empezar en 3 pasos»):
 
 ```cmake
@@ -168,6 +151,7 @@ class Simulador {
     void setTablero(const std::vector<std::string>& filas);
     void fin();
     bool abierto() const;
+    void pause(int ms);       // espera ms milisegundos para ver el tablero
     void esperarCierre();
 };
 ```

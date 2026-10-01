@@ -18,6 +18,8 @@ endif()
 option(ROBOTSIM_BUILD_EXAMPLES "Compilar los ejemplos" ${ROBOTSIM_IS_TOP_LEVEL})
 option(ROBOTSIM_BUILD_TESTS "Compilar los tests" ${ROBOTSIM_IS_TOP_LEVEL})
 
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/PracticaRobot.cmake)  # define robot_practica() para el CMakeLists del alumno
+
 find_package(Threads REQUIRED)
 
 # ---- GLFW: el del sistema si existe; si no, se descarga y compila ------------

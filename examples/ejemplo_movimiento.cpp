@@ -4,11 +4,9 @@
 // Fíjate en que el simulador NO decide nada: sólo muestra lo que el programa le cuenta.
 #include <Simulador.h>
 
-#include <chrono>
 #include <iostream>
 #include <queue>
 #include <string>
-#include <thread>
 #include <utility>
 #include <vector>
 
@@ -76,14 +74,14 @@ int main() {
     }
     std::cout << "Camino de " << camino.size() - 1 << " pasos. Cierra la ventana para terminar antes.\n";
 
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    simulador.pause(1000);
     for (std::size_t i = 1; i < camino.size() && simulador.abierto(); ++i) {
         const auto [ax, ay] = camino[i - 1];
         const auto [bx, by] = camino[i];
         tablero[ay][ax] = '-';  // casilla que dejamos: visitada
         tablero[by][bx] = 'R';  // casilla nueva: aquí está el robot
         simulador.setTablero(tablero);
-        std::this_thread::sleep_for(std::chrono::milliseconds(250));
+        simulador.pause(250);  // 250 ms entre un paso y el siguiente
     }
 
     std::cout << "Fin del algoritmo. Cierra la ventana para salir.\n";
