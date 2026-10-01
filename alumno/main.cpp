@@ -5,6 +5,11 @@ int main()
 {
     Simulador simulador;
 
+    // TUS DATOS: aparecen en el archivo de log que se genera al terminar (y que tienes que entregar).
+    simulador.setAutor("Nombre Apellidos");
+    simulador.setEmail("tu.correo@alumnos.urjc.es");
+    simulador.setPractica("Nombre de la practica");
+
     // Tablero de 5 filas x 8 columnas.
     //   R robot   X objetivo   * obstaculo   . libre   - ya visitada
     char tablero[5][8] = {
@@ -29,5 +34,5 @@ int main()
     //   y a simulador.pause(ms) para que dé tiempo a verlo.
 
     simulador.esperarCierre();       // mantiene la ventana hasta que la cierres
-    simulador.fin();
+    simulador.fin();                 // cierra y GUARDA el log (simulacion.log)
 }

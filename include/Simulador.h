@@ -66,9 +66,23 @@ public:
         setTableroConPaso(&tablero[0][0], tamX, tamY, static_cast<int>(N));
     }
 
+    // ---- Datos de la práctica (van al archivo de log) ----------------------
+    // Opcionales, pueden llamarse en cualquier momento antes de fin(). Lanzan std::invalid_argument si el valor
+    // está vacío, supera 200 caracteres, contiene saltos de línea/caracteres de control o (el email) no tiene
+    // formato nombre@dominio.
+    void setAutor(const std::string& autor);
+    void setEmail(const std::string& email);
+    void setPractica(const std::string& nombreDeLaPractica);
+    // Los tres a la vez (o ninguno, si alguno no es válido).
+    void setDatos(const std::string& autor, const std::string& email, const std::string& nombreDeLaPractica);
+    // Dónde se guarda el registro (por defecto "simulacion.log" en la carpeta desde la que ejecutas el programa).
+    void setArchivoLog(const std::string& ruta);
+
     // ---- Ciclo de vida ----------------------------------------------------
-    // Cierra la ventana y libera todo. Se puede llamar varias veces.
+    // Cierra la ventana, libera todo y GUARDA EL ARCHIVO DE LOG (estado inicial, estado final y checksum de
+    // verificación) si se llegó a mostrar algún tablero. Se puede llamar varias veces (el log se escribe una sola).
     // Después de fin(), setTablero() valida el tablero pero no hace nada más.
+    // Si te olvidas de llamarla, el destructor lo hace por ti.
     void fin();
 
     // false cuando la ventana se cerró (por el usuario o por fin()).

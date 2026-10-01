@@ -3,12 +3,14 @@
 #include <algorithm>
 #include <atomic>
 #include <chrono>
+#include <iostream>
 #include <mutex>
 #include <stdexcept>
 #include <thread>
 
 #include "Board.h"
 #include "RenderLoop.h"
+#include "SessionLog.h"
 #include "SharedBoard.h"
 
 // Estados del simulador (ver docs/DEVELOPER.md):
@@ -25,13 +27,16 @@ struct Simulador::Impl {
     RenderLoop loop{shared};
     std::mutex mutex;  // serializa publish / fin / reap; el hilo de render NUNCA lo toma
     std::atomic<State> state{State::Idle};
+    SessionLog log;            // protegido por 'mutex'
+    bool logWritten = false;
 
     void publish(Board board) {
         std::lock_guard<std::mutex> lock(mutex);
         switch (state.load()) {
             case State::Closed:
                 return;
-            case State::Idle:
+            case State::Idle: {
+                const Board first = board;  // para el registro (solo se anota si la ventana llega a abrirse)
                 shared.publish(std::move(board));  // antes de arrancar: el primer frame ya lo dibuja
                 try {
                     loop.start();
@@ -40,12 +45,15 @@ struct Simulador::Impl {
                     throw;
                 }
                 state.store(State::Running);
+                log.record(first);
                 return;
+            }
             case State::Running:
                 if (!loop.running()) {  // el usuario cerró la ventana
                     reap();
                     return;
                 }
+                log.record(board);
                 shared.publish(std::move(board));
                 return;
         }
@@ -58,6 +66,26 @@ struct Simulador::Impl {
             reap();
         }
         state.store(State::Closed);
+        writeLog();
+    }
+
+    // Escribe el .log una sola vez (la primera vez que se cierra el simulador) si llegó a mostrarse algún tablero.
+    // Nunca lanza: fin() y el destructor deben ser seguros.
+    void writeLog() {  // precondición: 'mutex' tomado
+        if (logWritten || !log.hasBoard()) return;
+        logWritten = true;
+        try {
+            const std::string path = log.write();
+            std::cout << "[Simulador] Registro de la simulacion guardado en: " << path << std::endl;
+        } catch (const std::exception& e) {
+            std::cerr << "[Simulador] ATENCION: no se pudo guardar el registro: " << e.what() << std::endl;
+        }
+    }
+
+    template <class F>
+    void withLog(F&& f) {
+        std::lock_guard<std::mutex> lock(mutex);
+        f(log);
     }
 
     bool isOpen() const {
@@ -116,6 +144,35 @@ void Simulador::setTablero(const std::vector<std::string>& filas) { impl_->publi
 
 void Simulador::setTableroConPaso(const char* tablero, int tamX, int tamY, int paso) {
     impl_->publish(Board::fromFlat(tablero, tamX, tamY, paso));
+}
+
+void Simulador::setAutor(const std::string& autor) {
+    impl_->withLog([&](SessionLog& l) { l.setAutor(autor); });
+}
+
+void Simulador::setEmail(const std::string& email) {
+    impl_->withLog([&](SessionLog& l) { l.setEmail(email); });
+}
+
+void Simulador::setPractica(const std::string& practica) {
+    impl_->withLog([&](SessionLog& l) { l.setPractica(practica); });
+}
+
+void Simulador::setDatos(const std::string& autor, const std::string& email, const std::string& practica) {
+    // Se valida todo antes de guardar nada: o se aceptan los tres datos o ninguno.
+    SessionLog probe;
+    probe.setAutor(autor);
+    probe.setEmail(email);
+    probe.setPractica(practica);
+    impl_->withLog([&](SessionLog& l) {
+        l.setAutor(autor);
+        l.setEmail(email);
+        l.setPractica(practica);
+    });
+}
+
+void Simulador::setArchivoLog(const std::string& ruta) {
+    impl_->withLog([&](SessionLog& l) { l.setArchivo(ruta); });
 }
 
 void Simulador::fin() { impl_->fin(); }

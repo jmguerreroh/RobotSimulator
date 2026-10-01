@@ -57,6 +57,24 @@ una vez cerrada la anterior.
 ## `bool abierto() const`
 `true` antes de la primera llamada a `setTablero` y mientras la ventana esté abierta; `false` después.
 
+## Datos de la práctica y archivo de log
+
+```cpp
+simulador.setAutor("Nombre Apellidos");
+simulador.setEmail("tu.correo@universidad.es");
+simulador.setPractica("Nombre de la practica");
+simulador.setDatos(autor, email, practica);     // los tres a la vez: o se aceptan todos o ninguno
+simulador.setArchivoLog("mi_practica.log");     // por defecto "simulacion.log"
+```
+Valores no válidos (vacíos, de más de 200 caracteres, con saltos de línea/tabuladores, o un email sin formato
+`nombre@dominio`) lanzan `std::invalid_argument`.
+
+`fin()` (o el destructor, si olvidas llamarla) escribe **una sola vez** el log si llegó a mostrarse algún tablero:
+datos de la práctica, fecha/hora (UTC) de inicio y fin, duración, nº de actualizaciones, **estado inicial** (primer
+tablero), **estado final** (último tablero), un resumen y el **checksum** de todo el archivo en la última línea.
+Los `setTablero` posteriores a `fin()` no cuentan. Si no se puede escribir el archivo se avisa por `stderr` y el programa
+continúa. Entrega el log sin modificar: cualquier edición lo invalida.
+
 ## `void pause(int ms)`
 Espera `ms` milisegundos para que dé tiempo a ver el tablero; la ventana sigue dibujando durante la espera. Si la
 ventana se cierra durante la pausa (o ya estaba cerrada, o se llamó a `fin()`) vuelve **de inmediato**, así un bucle con

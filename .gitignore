@@ -1,1 +1,15 @@
+# Compilación
 build/
+cmake-build-*/
+
+# ===== MATERIAL DEL PROFESOR: NO SE SUBE AL REPOSITORIO =====
+# Verificador de los archivos .log de los alumnos (contiene la clave de firma) y su guía.
+profesor/
+
+# Archivos de log generados al ejecutar los programas
+*.log
+
+# Editores y sistema
+.vscode/
+.idea/
+.DS_Store

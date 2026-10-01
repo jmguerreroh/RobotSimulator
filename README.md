@@ -151,6 +151,11 @@ class Simulador {
     void setTablero(const std::vector<std::string>& filas);
     void fin();
     bool abierto() const;
+    void setAutor(const std::string& autor);            // datos que aparecen en el log
+    void setEmail(const std::string& email);
+    void setPractica(const std::string& nombre);
+    void setDatos(const std::string& autor, const std::string& email, const std::string& nombre);
+    void setArchivoLog(const std::string& ruta);        // por defecto: simulacion.log
     void pause(int ms);       // espera ms milisegundos para ver el tablero
     void esperarCierre();
 };
@@ -182,3 +187,22 @@ shaders/                   basic.vert, basic.frag (se embeben en la biblioteca a
 cmake/                     plantilla de la cabecera de shaders embebidos
 examples/  tests/  docs/  third_party/ (GLAD, GLM)
 ```
+
+### Tus datos y el archivo de log
+
+Indica quién eres (en `main.cpp`, antes de empezar):
+
+```cpp
+simulador.setAutor("Nombre Apellidos");
+simulador.setEmail("tu.correo@universidad.es");
+simulador.setPractica("Nombre de la practica");
+// o los tres a la vez: simulador.setDatos("Nombre Apellidos", "tu.correo@universidad.es", "Nombre de la practica");
+```
+
+Al llamar a `simulador.fin()` (o al terminar el programa) se guarda el archivo **`simulacion.log`** en la carpeta desde la
+que ejecutas el programa. Contiene tus datos, el **estado inicial** y el **estado final** del tablero, un resumen
+(posición final del robot, si llegó a la `X`, casillas visitadas) y un **checksum** de verificación en la última línea.
+**Entrega ese archivo tal cual: no lo edites** (cualquier cambio lo invalida). Puedes cambiar su nombre/ubicación con
+`simulador.setArchivoLog("ruta.log")`. Se genera una vez por ejecución; cada ejecución sobrescribe el anterior, así que
+copia el bueno antes de volver a ejecutar.
+

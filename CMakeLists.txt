@@ -63,6 +63,8 @@ add_library(RobotSimulator STATIC
   src/Mesh.cpp
   src/RenderLoop.cpp
   src/Renderer.cpp
+  src/SessionLog.cpp
+  src/Sha256.cpp
   src/Shader.cpp
   src/Window.cpp)
 add_library(RobotSimulator::RobotSimulator ALIAS RobotSimulator)
