@@ -1,0 +1,10 @@
+// Archivo generado por CMake a partir de shaders/*.vert|frag. NO editar.
+#pragma once
+
+namespace shaders {
+
+inline constexpr const char* kBasicVert = R"GLSL(@BASIC_VERT_SOURCE@)GLSL";
+
+inline constexpr const char* kBasicFrag = R"GLSL(@BASIC_FRAG_SOURCE@)GLSL";
+
+}  // namespace shaders
