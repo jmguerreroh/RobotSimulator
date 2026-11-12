@@ -49,7 +49,7 @@ int main(int argc, char** argv) {
     CHECK(contenido.find("actualizaciones: 3\n") != std::string::npos);
     CHECK(contenido.find("--- ESTADO INICIAL ---\ndimensiones: 3x3\nR..\n.*.\n..X\n") != std::string::npos);
     CHECK(contenido.find("--- ESTADO FINAL ---\ndimensiones: 3x3\n---\n.*-\n..R\n") != std::string::npos);
-    CHECK(contenido.find("objetivo-alcanzado: si\n") != std::string::npos);
+    CHECK(contenido.find("objetivo-alcanzado: 1/1\n") != std::string::npos);
     CHECK(contenido.find("casillas-visitadas: 4\n") != std::string::npos);
     CHECK(contenido.find("\r") == std::string::npos);  // solo '\n': el checksum es igual en todos los sistemas
 
@@ -83,6 +83,17 @@ int main(int argc, char** argv) {
     SessionLog sinDatos;
     sinDatos.record(Board::fromStrings({"R.X"}));
     CHECK(sinDatos.render(fin, 0.0).find("autor: (sin indicar)\n") != std::string::npos);
+    CHECK(sinDatos.render(fin, 0.0).find("objetivo-alcanzado: 0/1\n") != std::string::npos);  // no la ha pisado
+
+    // Varios objetivos: cuenta las X iniciales que el robot ha pisado (R) o dejado visitadas (-).
+    SessionLog varios;
+    varios.record(Board::fromStrings({"RX.", "...", "..X"}));
+    varios.record(Board::fromStrings({"-R.", "...", "..X"}));
+    varios.record(Board::fromStrings({"--R", "...", "..X"}));
+    CHECK(varios.render(fin, 0.0).find("objetivo-alcanzado: 1/2\n") != std::string::npos);
+    SessionLog ninguno;
+    ninguno.record(Board::fromStrings({"R.."}));
+    CHECK(ninguno.render(fin, 0.0).find("objetivo-alcanzado: 0/0\n") != std::string::npos);
 
     // ---- Escritura a fichero (binario) y relectura ---------------------------------------------------
     const std::string ruta = argc > 1 ? argv[1] : "test_log_salida.log";

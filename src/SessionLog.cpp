@@ -123,12 +123,16 @@ std::string SessionLog::render(std::chrono::system_clock::time_point end, double
     for (int y = 0; y < last_.height(); ++y)
         for (int x = 0; x < last_.width(); ++x)
             if (last_.at(x, y) == Cell::Visited) ++visited;
-    bool anyGoal = false, reached = false;
+    // Objetivos: las X del tablero inicial. Se cuentan como alcanzados los que en el tablero final están
+    // pisados por el robot o marcados como visitados (el robot ya ha pasado por encima).
+    int goals = 0, reached = 0;
     for (int y = 0; y < initial_.height(); ++y) {
         for (int x = 0; x < initial_.width(); ++x) {
             if (initial_.at(x, y) != Cell::Goal) continue;
-            anyGoal = true;
-            if (last_.hasRobot() && last_.robotX() == x && last_.robotY() == y) reached = true;
+            ++goals;
+            if (x < last_.width() && y < last_.height() &&
+                (last_.at(x, y) == Cell::Visited || last_.at(x, y) == Cell::Robot))
+                ++reached;
         }
     }
     os << "\n--- RESUMEN ---\n";
@@ -136,7 +140,7 @@ std::string SessionLog::render(std::chrono::system_clock::time_point end, double
         os << "robot-final: columna " << last_.robotX() << ", fila " << last_.robotY() << "\n";
     else
         os << "robot-final: ninguno\n";
-    os << "objetivo-alcanzado: " << (!anyGoal ? "sin-objetivo" : (reached ? "si" : "no")) << "\n";
+    os << "objetivo-alcanzado: " << reached << "/" << goals << "\n";
     os << "casillas-visitadas: " << visited << "\n";
     os << "\n--- FIRMA ---\n";
 

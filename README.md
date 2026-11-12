@@ -197,7 +197,8 @@ simulador.setPractica("Nombre de la practica");
 
 Al llamar a `simulador.fin()` (o al terminar el programa) se guarda el archivo **`simulacion.log`** en la carpeta desde la
 que ejecutas el programa. Contiene tus datos, el **estado inicial** y el **estado final** del tablero, un resumen
-(posición final del robot, si llegó a la `X`, casillas visitadas) y un **checksum** de verificación en la última línea.
+(posición final del robot, cuántas `X` has alcanzado del total, por ejemplo `objetivo-alcanzado: 2/3`, casillas
+visitadas) y un **checksum** de verificación en la última línea.
 **Entrega ese archivo tal cual: no lo edites** (cualquier cambio lo invalida). Puedes cambiar su nombre/ubicación con
 `simulador.setArchivoLog("ruta.log")`. Se genera una vez por ejecución; cada ejecución sobrescribe el anterior, así que
 copia el bueno antes de volver a ejecutar.
